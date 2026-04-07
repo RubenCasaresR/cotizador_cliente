@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Cotizador de Dólares</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
+
+    <style>
+        /* Ocultar el selector de "registros por página" para ahorrar espacio en el panel lateral */
+        .dataTable-dropdown { display: none; }
+        /* Estilizar la barra de búsqueda */
+        .dataTable-search { width: 100%; float: none !important; margin-bottom: 10px; }
+        .dataTable-input { 
+            width: 100% !important; 
+            border-radius: 0.5rem; 
+            border: 1px solid #d1d5db; 
+            font-size: 0.75rem; 
+            padding: 0.5rem 0.75rem; 
+            outline: none;
+        }
+        .dataTable-input:focus { border-color: #374151; box-shadow: 0 0 0 2px rgba(55, 65, 81, 0.2); }
+        /* Estilizar la paginación y el texto de información */
+        .dataTable-bottom { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 10px; 
+            padding: 15px 10px !important; 
+            background-color: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
+        .dataTable-info { margin: 0; font-size: 0.7rem; color: #6b7280; font-weight: 600;}
+        .dataTable-pagination { margin: 0; }
+        .dataTable-pagination a { color: #4b5563; border-radius: 0.25rem; padding: 4px 10px; font-size: 0.75rem; font-weight: bold;}
+        .dataTable-pagination .active a, .dataTable-pagination .active a:hover { background-color: #1f2937; color: white; }
+        .dataTable-container { border-bottom: none !important; }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen overflow-hidden flex flex-col font-sans relative">
+
+    <header class="bg-gray-900 text-white py-3 px-6 shadow-md flex justify-between items-center shrink-0 z-10">
+        <div class="flex items-center gap-3">
+            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h1 class="text-xl font-bold tracking-wider">DASHBOARD DIVISAS</h1>
+        </div>
+        <div id="api_status" class="text-xs font-semibold px-4 py-1.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700 shadow-inner flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-gray-500 animate-pulse" id="api_dot"></span>
+            <span id="api_text">Conectando...</span>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden p-4 gap-4">
+
+        <div class="w-[65%] flex gap-4 overflow-y-auto pr-1">
+            
+            <div class="w-1/2 bg-white rounded-xl shadow border border-gray-200 flex flex-col h-fit relative">
+                <div id="badge_compra" class="hidden absolute -top-3 -right-3 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow z-10">Editando</div>
+                <div class="bg-green-700 text-white p-3 rounded-t-xl">
+                    <h2 class="text-lg font-bold text-center tracking-wide">COMPRA DLLS</h2>
+                </div>
+                <div class="p-5 space-y-3 flex-grow">
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">CANTIDAD EN USD</label><div class="relative"><span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">$</span><input type="text" inputmode="numeric" id="c_usd" class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition" value="73965.32"></div></div>
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">TIPO DE CAMBIO</label><div class="relative"><span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">$</span><input type="text" inputmode="numeric" id="c_tc" class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition"></div></div>
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">COMISIÓN (%)</label><div class="relative"><input type="number" id="c_comision_pct" class="w-full pl-3 pr-8 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition" value="2"><span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 font-bold">%</span></div></div>
+                    <hr class="my-3 border-gray-200">
+                    <div class="flex justify-between items-center text-sm text-gray-600"><span class="font-semibold">Conversión (MXN)</span><span id="c_conversion" class="font-mono">$0.00</span></div>
+                    <div class="flex justify-between items-center text-sm text-red-600"><span class="font-semibold">Comisión (Resta)</span><span id="c_comision_monto" class="font-mono">-$0.00</span></div>
+                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2"><span class="text-sm font-bold text-gray-700">TOTAL NETO</span><span id="c_total" class="text-xl font-mono font-bold text-green-700">$0.00</span></div>
+                </div>
+                <div class="p-3 bg-gray-50 border-t border-gray-200 rounded-b-xl flex gap-2">
+                    <button id="btn_compra" onclick="generarPDF('compra')" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded shadow-sm transition flex justify-center items-center gap-2 text-sm">Guardar e Imprimir</button>
+                    <button id="btn_cancelar_compra" onclick="cancelarEdicion('compra')" class="hidden bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-3 rounded shadow-sm transition text-sm">X</button>
+                </div>
+            </div>
+
+            <div class="w-1/2 bg-white rounded-xl shadow border border-gray-200 flex flex-col h-fit relative">
+                <div id="badge_venta" class="hidden absolute -top-3 -right-3 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow z-10">Editando</div>
+                <div class="bg-blue-800 text-white p-3 rounded-t-xl">
+                    <h2 class="text-lg font-bold text-center tracking-wide">VENTA DLLS</h2>
+                </div>
+                <div class="p-5 space-y-3 flex-grow">
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">CANTIDAD EN USD</label><div class="relative"><span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">$</span><input type="text" inputmode="numeric" id="v_usd" class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition" value="50000.00"></div></div>
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">TIPO DE CAMBIO</label><div class="relative"><span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">$</span><input type="text" inputmode="numeric" id="v_tc" class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition"></div></div>
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">COMISIÓN (%)</label><div class="relative"><input type="number" id="v_comision_pct" class="w-full pl-3 pr-8 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition" value="10"><span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 font-bold">%</span></div></div>
+                    <hr class="my-3 border-gray-200">
+                    <div class="flex justify-between items-center text-sm text-gray-600"><span class="font-semibold">Conversión (MXN)</span><span id="v_conversion" class="font-mono">$0.00</span></div>
+                    <div class="flex justify-between items-center text-sm text-blue-600"><span class="font-semibold">Comisión (Suma)</span><span id="v_comision_monto" class="font-mono">+$0.00</span></div>
+                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2"><span class="text-sm font-bold text-gray-700">TOTAL NETO</span><span id="v_total" class="text-xl font-mono font-bold text-blue-800">$0.00</span></div>
+                </div>
+                <div class="p-3 bg-gray-50 border-t border-gray-200 rounded-b-xl flex gap-2">
+                    <button id="btn_venta" onclick="generarPDF('venta')" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 rounded shadow-sm transition flex justify-center items-center gap-2 text-sm">Guardar e Imprimir</button>
+                    <button id="btn_cancelar_venta" onclick="cancelarEdicion('venta')" class="hidden bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-3 rounded shadow-sm transition text-sm">X</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-[35%] bg-white rounded-xl shadow border border-gray-200 flex flex-col overflow-hidden">
+            <div class="bg-gray-800 text-white p-3 flex justify-between items-center shrink-0">
+                <h2 class="text-sm font-bold tracking-wide">HISTORIAL</h2>
+                <button onclick="cargarHistorial()" class="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded transition">Actualizar</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-3">
+                <table id="tabla-historial" class="w-full text-left border-collapse">
+                    <thead class="bg-gray-100 border-b border-gray-200 shadow-sm z-10">
+                        <tr class="text-gray-600 uppercase text-[10px] tracking-wider">
+                            <th class="p-2 font-bold">Detalles</th>
+                            <th class="p-2 font-bold text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-historial-body" class="divide-y divide-gray-100">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-preview" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex justify-center items-center p-6 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="bg-gray-100 p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800 text-lg">Vista Previa del Documento</h3>
+                <button onclick="cerrarVistaPrevia()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-4 rounded shadow">Cerrar</button>
+            </div>
+            <div class="flex-grow p-0 w-full h-full">
+                <iframe id="preview-iframe" class="w-full h-full border-none" src=""></iframe>
+            </div>
+        </div>
+    </div>
+
+    <div class="absolute left-[-9999px] top-[-9999px]">
+        <div id="plantilla-pdf" class="w-[800px] p-10 bg-white text-gray-800 font-sans">
+            <div class="flex justify-between items-start border-b-2 border-gray-800 pb-6 mb-6">
+                <div><h1 class="text-4xl font-extrabold tracking-tight text-gray-900">CASA DE CAMBIO</h1><p class="text-gray-500 mt-1">Servicios Financieros Seguros</p></div>
+                <div class="text-right"><h2 class="text-2xl font-bold text-gray-700" id="pdf-titulo-tipo">COTIZACIÓN</h2><p class="text-sm font-semibold mt-2">Folio: <span id="pdf-folio" class="text-gray-500 font-normal"></span></p><p class="text-sm font-semibold">Fecha: <span id="pdf-fecha" class="text-gray-500 font-normal"></span></p></div>
+            </div>
+            <div class="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800 mb-2 border-b border-gray-300 pb-2">Detalles de la Operación</h3>
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div><p class="text-sm text-gray-500 uppercase">Monto en Dólares (USD)</p><p class="text-xl font-semibold" id="pdf-usd"></p></div>
+                    <div><p class="text-sm text-gray-500 uppercase">Tipo de Cambio</p><p class="text-xl font-semibold" id="pdf-tc"></p></div>
+                </div>
+            </div>
+            <table class="w-full text-left border-collapse mb-8">
+                <thead><tr class="bg-gray-800 text-white"><th class="py-3 px-4 font-semibold text-sm">Concepto</th><th class="py-3 px-4 font-semibold text-sm text-right">Monto (MXN)</th></tr></thead>
+                <tbody class="border-b border-gray-200">
+                    <tr class="border-b border-gray-200"><td class="py-4 px-4 text-gray-700">Conversión base a pesos</td><td class="py-4 px-4 text-right font-mono" id="pdf-conversion"></td></tr>
+                    <tr class="border-b border-gray-200 bg-gray-50"><td class="py-4 px-4 text-gray-700">Comisión Aplicada (<span id="pdf-pct-txt"></span>%) <br><span class="text-xs text-gray-500" id="pdf-tipo-comision-txt"></span></td><td class="py-4 px-4 text-right font-mono text-gray-600" id="pdf-comision"></td></tr>
+                </tbody>
+                <tfoot><tr><td class="py-4 px-4 font-bold text-lg text-right uppercase">Total Neto:</td><td class="py-4 px-4 font-bold text-2xl text-right font-mono text-gray-900" id="pdf-total"></td></tr></tfoot>
+            </table>
+            <div class="mt-16 text-center text-xs text-gray-500 border-t border-gray-300 pt-4">
+                <p>Esta cotización es de carácter informativo y está sujeta a la volatilidad del mercado cambiario en tiempo real.</p>
+                <p class="mt-1">Documento generado electrónicamente.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const currencyFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', minimumFractionDigits: 2 });
+        const usdFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
+
+        let editando = { compra: null, venta: null };
+        let dataTableInstancia = null; // Variable global para guardar el Data Table
+
+        function aplicarMascaraMoneda(input) {
+            let numeros = input.value.replace(/\D/g, '');
+            if (numeros === '') { input.value = ''; return; }
+            numeros = numeros.padStart(3, '0');
+            let parteEntera = numeros.slice(0, -2);
+            let parteDecimal = numeros.slice(-2);
+            parteEntera = parseInt(parteEntera, 10).toString();
+            parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            input.value = parteEntera + '.' + parteDecimal;
+        }
+
+        function obtenerValorLimpio(id) {
+            let valor = document.getElementById(id).value;
+            return parseFloat(valor.replace(/,/g, '')) || 0;
+        }
+
+        function calcularCompra() {
+            const usd = obtenerValorLimpio('c_usd');
+            const tc = obtenerValorLimpio('c_tc');
+            const comisionPct = parseFloat(document.getElementById('c_comision_pct').value) || 0;
+            const conversion = usd * tc;
+            const comisionMonto = conversion * (comisionPct / 100);
+            const total = conversion - comisionMonto;
+
+            document.getElementById('c_conversion').innerText = currencyFormatter.format(conversion);
+            document.getElementById('c_comision_monto').innerText = "-" + currencyFormatter.format(comisionMonto);
+            document.getElementById('c_total').innerText = currencyFormatter.format(total);
+        }
+
+        function calcularVenta() {
+            const usd = obtenerValorLimpio('v_usd');
+            const tc = obtenerValorLimpio('v_tc');
+            const comisionPct = parseFloat(document.getElementById('v_comision_pct').value) || 0;
+            const conversion = usd * tc;
+            let total = 0; if (comisionPct < 100) total = conversion / (1 - (comisionPct / 100));
+            const comisionMonto = total - conversion;
+
+            document.getElementById('v_conversion').innerText = currencyFormatter.format(conversion);
+            document.getElementById('v_comision_monto').innerText = "+" + currencyFormatter.format(comisionMonto);
+            document.getElementById('v_total').innerText = currencyFormatter.format(total);
+        }
+
+        async function obtenerTipoCambioYahoo() {
+            try {
+                const res = await fetch('api_dolar.php');
+                const data = await res.json();
+                if (data.success) {
+                    const tcActual = parseFloat(data.precio).toFixed(2);
+                    
+                    if(!editando.compra) { document.getElementById('c_tc').value = tcActual; aplicarMascaraMoneda(document.getElementById('c_tc')); }
+                    if(!editando.venta) { document.getElementById('v_tc').value = tcActual; aplicarMascaraMoneda(document.getElementById('v_tc')); }
+                    
+                    document.getElementById('api_text').innerText = "Yahoo Finance: $" + tcActual + " MXN";
+                    document.getElementById('api_status').classList.replace('bg-gray-800', 'bg-green-900');
+                    document.getElementById('api_status').classList.replace('text-gray-400', 'text-green-100');
+                    document.getElementById('api_dot').classList.replace('bg-gray-500', 'bg-green-400');
+                    
+                    calcularCompra(); calcularVenta();
+                }
+            } catch (error) { console.error("Error API"); }
+        }
+
+        async function generarPDF(tipo) {
+            let prefijo = tipo === 'compra' ? 'c_' : 'v_';
+            const folioActual = editando[tipo] ? editando[tipo].folio : "COT-" + Math.floor(Math.random() * 100000);
+            
+            const datos = {
+                id: editando[tipo] ? editando[tipo].id : null, 
+                tipo: tipo,
+                folio: folioActual,
+                usd: obtenerValorLimpio(prefijo + 'usd'),
+                tc: obtenerValorLimpio(prefijo + 'tc'),
+                comision_pct: parseFloat(document.getElementById(prefijo + 'comision_pct').value) || 0,
+                comision_monto: parseFloat(document.getElementById(prefijo + 'comision_monto').innerText.replace(/[^0-9.-]+/g,"")),
+                total: parseFloat(document.getElementById(prefijo + 'total').innerText.replace(/[^0-9.-]+/g,"")),
+                fecha: new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' })
+            };
+
+            try {
+                await fetch('api_historial.php?action=guardar', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos)
+                });
+                cancelarEdicion(tipo); 
+                cargarHistorial(); 
+            } catch (e) { console.error("Error BD", e); }
+
+            ejecutarAccionPDF(datos, 'descargar');
+        }
+
+        function activarEdicion(regString) {
+            const reg = JSON.parse(regString.replace(/&quot;/g, '"'));
+            const tipo = reg.tipo;
+            const prefijo = tipo === 'compra' ? 'c_' : 'v_';
+            
+            document.getElementById(prefijo + 'usd').value = parseFloat(reg.usd).toFixed(2);
+            document.getElementById(prefijo + 'tc').value = parseFloat(reg.tc).toFixed(2);
+            document.getElementById(prefijo + 'comision_pct').value = reg.comision_pct;
+            
+            aplicarMascaraMoneda(document.getElementById(prefijo + 'usd'));
+            aplicarMascaraMoneda(document.getElementById(prefijo + 'tc'));
+            
+            editando[tipo] = reg;
+            document.getElementById('badge_' + tipo).classList.remove('hidden');
+            document.getElementById('btn_' + tipo).innerText = "Actualizar Cotización";
+            document.getElementById('btn_' + tipo).classList.replace('bg-' + (tipo==='compra'?'green':'blue') + '-600', 'bg-yellow-600');
+            document.getElementById('btn_cancelar_' + tipo).classList.remove('hidden');
+            
+            if(tipo === 'compra') calcularCompra(); else calcularVenta();
+        }
+
+        function cancelarEdicion(tipo) {
+            editando[tipo] = null;
+            document.getElementById('badge_' + tipo).classList.add('hidden');
+            const colorOriginal = tipo === 'compra' ? 'green' : 'blue';
+            document.getElementById('btn_' + tipo).innerText = "Guardar e Imprimir";
+            document.getElementById('btn_' + tipo).className = `w-full bg-${colorOriginal}-600 hover:bg-${colorOriginal}-700 text-white font-bold py-2 rounded shadow-sm transition flex justify-center items-center gap-2 text-sm`;
+            document.getElementById('btn_cancelar_' + tipo).classList.add('hidden');
+        }
+
+        async function eliminarCotizacion(id) {
+            if(confirm("¿Estás seguro de eliminar esta cotización del historial?")) {
+                await fetch('api_historial.php?action=eliminar', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({id: id})
+                });
+                cargarHistorial();
+            }
+        }
+
+        function ejecutarAccionPDF(d, accion) {
+            document.getElementById('pdf-titulo-tipo').innerText = d.tipo === 'compra' ? 'COMPRA DE DIVISAS' : 'VENTA DE DIVISAS';
+            document.getElementById('pdf-folio').innerText = d.folio;
+            document.getElementById('pdf-fecha').innerText = d.fecha;
+            document.getElementById('pdf-usd').innerText = usdFormatter.format(d.usd);
+            document.getElementById('pdf-tc').innerText = currencyFormatter.format(d.tc) + " MXN";
+            document.getElementById('pdf-conversion').innerText = currencyFormatter.format(d.usd * d.tc);
+            document.getElementById('pdf-pct-txt').innerText = d.comision_pct;
+
+            if(d.tipo === 'compra') {
+                document.getElementById('pdf-tipo-comision-txt').innerText = "Deducción de comisión";
+                document.getElementById('pdf-comision').classList.replace('text-blue-600', 'text-red-600');
+            } else {
+                document.getElementById('pdf-tipo-comision-txt').innerText = "Cargo por servicio";
+                document.getElementById('pdf-comision').classList.replace('text-red-600', 'text-blue-600');
+            }
+            document.getElementById('pdf-comision').innerText = currencyFormatter.format(d.comision_monto);
+            document.getElementById('pdf-total').innerText = currencyFormatter.format(d.total);
+
+            const elemento = document.getElementById('plantilla-pdf');
+            const opciones = { margin: 0, filename: `${d.folio}_${d.tipo}.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
+
+            if(accion === 'descargar') {
+                html2pdf().set(opciones).from(elemento).save();
+            } else if (accion === 'previsualizar') {
+                html2pdf().set(opciones).from(elemento).outputPdf('bloburl').then(function(pdfUrl) {
+                    document.getElementById('preview-iframe').src = pdfUrl;
+                    document.getElementById('modal-preview').classList.remove('hidden');
+                });
+            }
+        }
+
+        function abrirVistaPrevia(regString) {
+            const reg = JSON.parse(regString.replace(/&quot;/g, '"'));
+            reg.fecha = new Date(reg.fecha_hora).toLocaleString('es-MX', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+            ejecutarAccionPDF(reg, 'previsualizar');
+        }
+
+        function cerrarVistaPrevia() {
+            document.getElementById('modal-preview').classList.add('hidden');
+            document.getElementById('preview-iframe').src = ""; 
+        }
+
+        function reimprimir(regString) {
+            const reg = JSON.parse(regString.replace(/&quot;/g, '"'));
+            reg.fecha = new Date(reg.fecha_hora).toLocaleString('es-MX', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+            ejecutarAccionPDF(reg, 'descargar');
+        }
+
+        async function cargarHistorial() {
+            try {
+                const res = await fetch('api_historial.php?action=listar');
+                const data = await res.json();
+                
+                // 1. Destruimos la instancia anterior si existe
+                if (dataTableInstancia) {
+                    dataTableInstancia.destroy();
+                }
+
+                const tbody = document.getElementById('tabla-historial-body');
+                tbody.innerHTML = '';
+
+                data.forEach(reg => {
+                    const jsonReg = JSON.stringify(reg).replace(/"/g, '&quot;');
+                    const colorTipo = reg.tipo === 'compra' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800';
+                    const colorTotal = reg.tipo === 'compra' ? 'text-green-700' : 'text-blue-800';
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50 transition border-b border-gray-100";
+                    tr.innerHTML = `
+                        <td class="p-3">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="font-bold text-gray-800 text-xs">${reg.folio}</div>
+                                    <div class="text-[10px] text-gray-500">${reg.fecha_hora}</div>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase shadow-sm ${colorTipo}">${reg.tipo}</span>
+                            </div>
+                            
+                            <div class="bg-gray-100 p-2.5 rounded-md border border-gray-200 text-[10px] space-y-1.5 shadow-inner">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-500 font-semibold uppercase">Dólares (USD):</span>
+                                    <span class="font-mono font-bold text-gray-700">${usdFormatter.format(reg.usd)}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-500 font-semibold uppercase">Tipo de Cambio:</span>
+                                    <span class="font-mono font-bold text-gray-700">${currencyFormatter.format(reg.tc)}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-500 font-semibold uppercase">Comisión Aplicada:</span>
+                                    <span class="font-mono font-bold text-gray-700">${reg.comision_pct}%</span>
+                                </div>
+                                <div class="flex justify-between items-center border-t border-gray-300 pt-1.5 mt-1">
+                                    <span class="text-gray-800 font-extrabold uppercase text-[11px]">Total Neto:</span>
+                                    <span class="font-mono font-extrabold text-[12px] ${colorTotal}">${currencyFormatter.format(reg.total)}</span>
+                                </div>
+                            </div>
+                        </td>
+                        
+                        <td class="p-2 align-middle w-14">
+                            <div class="flex flex-col gap-1.5 justify-center">
+                                <button onclick="abrirVistaPrevia('${jsonReg}')" class="text-blue-600 hover:bg-blue-100 p-1.5 rounded-md border border-transparent hover:border-blue-200 transition bg-white shadow-sm" title="Ver PDF"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button>
+                                <button onclick="reimprimir('${jsonReg}')" class="text-green-600 hover:bg-green-100 p-1.5 rounded-md border border-transparent hover:border-green-200 transition bg-white shadow-sm" title="Descargar PDF"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg></button>
+                                <button onclick="activarEdicion('${jsonReg}')" class="text-yellow-600 hover:bg-yellow-100 p-1.5 rounded-md border border-transparent hover:border-yellow-200 transition bg-white shadow-sm" title="Editar"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
+                                <button onclick="eliminarCotizacion(${reg.id})" class="text-red-500 hover:bg-red-100 p-1.5 rounded-md border border-transparent hover:border-red-200 transition bg-white shadow-sm" title="Eliminar"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // 2. Volvemos a inicializar el Data Table
+                dataTableInstancia = new simpleDatatables.DataTable("#tabla-historial", {
+                    searchable: true,
+                    perPage: 10,
+                    labels: {
+                        placeholder: "Buscar folio, fecha...",
+                        noRows: "No hay cotizaciones guardadas",
+                        info: "{start} a {end} de {rows}"
+                    }
+                });
+
+            } catch (error) { console.error("Error", error); }
+        }
+
+        ['c_usd', 'c_tc'].forEach(id => { document.getElementById(id).addEventListener('input', function(e) { aplicarMascaraMoneda(e.target); calcularCompra(); }); });
+        document.getElementById('c_comision_pct').addEventListener('input', calcularCompra);
+
+        ['v_usd', 'v_tc'].forEach(id => { document.getElementById(id).addEventListener('input', function(e) { aplicarMascaraMoneda(e.target); calcularVenta(); }); });
+        document.getElementById('v_comision_pct').addEventListener('input', calcularVenta);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            aplicarMascaraMoneda(document.getElementById('c_usd'));
+            aplicarMascaraMoneda(document.getElementById('v_usd'));
+            calcularCompra(); calcularVenta();   
+            obtenerTipoCambioYahoo(); cargarHistorial();    
+        });
+    </script>
+</body>
+</html>
