@@ -81,7 +81,7 @@
                     <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2"><span class="text-sm font-bold text-gray-700">TOTAL NETO</span><span id="c_total" class="text-xl font-mono font-bold text-green-700">$0.00</span></div>
                 </div>
                 <div class="p-3 bg-gray-50 border-t border-gray-200 rounded-b-xl flex gap-2">
-                    <button id="btn_compra" onclick="generarPDF('compra')" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded shadow-sm transition flex justify-center items-center gap-2 text-sm">Guardar e Imprimir</button>
+                    <button id="btn_compra" onclick="generarPDF('compra')" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded shadow-sm transition flex justify-center items-center gap-2 text-sm">Guardar y Ver</button>
                     <button id="btn_cancelar_compra" onclick="cancelarEdicion('compra')" class="hidden bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-3 rounded shadow-sm transition text-sm">X</button>
                 </div>
             </div>
@@ -101,7 +101,7 @@
                     <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2"><span class="text-sm font-bold text-gray-700">TOTAL NETO</span><span id="v_total" class="text-xl font-mono font-bold text-blue-800">$0.00</span></div>
                 </div>
                 <div class="p-3 bg-gray-50 border-t border-gray-200 rounded-b-xl flex gap-2">
-                    <button id="btn_venta" onclick="generarPDF('venta')" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 rounded shadow-sm transition flex justify-center items-center gap-2 text-sm">Guardar e Imprimir</button>
+                    <button id="btn_venta" onclick="generarPDF('venta')" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 rounded shadow-sm transition flex justify-center items-center gap-2 text-sm">Guardar y Ver</button>
                     <button id="btn_cancelar_venta" onclick="cancelarEdicion('venta')" class="hidden bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-3 rounded shadow-sm transition text-sm">X</button>
                 </div>
             </div>
@@ -140,57 +140,57 @@
     </div>
 
     <div class="absolute left-[-9999px] top-[-9999px]">
-        <div id="plantilla-pdf" class="w-[800px] p-12 bg-white text-gray-800 font-sans">
+        <div id="plantilla-pdf" class="w-[800px] p-12 bg-white text-black font-sans">
             
-            <h1 class="text-3xl font-bold text-center text-gray-900 uppercase tracking-wide mb-10" id="pdf-titulo-tipo">COTIZACIÓN</h1>
+            <h1 class="text-3xl font-extrabold text-center text-black uppercase tracking-wide mb-10" id="pdf-titulo-tipo">COTIZACIÓN</h1>
 
             <table class="w-full text-sm text-left border-collapse mb-8">
-                <tbody class="border border-gray-200">
-                    <tr class="border-b border-gray-200">
-                        <td class="py-2.5 px-3 w-1/3 bg-gray-50 font-semibold text-gray-600">Folio:</td>
-                        <td class="py-2.5 px-3 text-gray-900" id="pdf-folio"></td>
+                <tbody class="border-2 border-gray-400">
+                    <tr class="border-b border-gray-300">
+                        <td class="py-2.5 px-3 w-1/3 bg-gray-100 font-bold text-black">Folio:</td>
+                        <td class="py-2.5 px-3 text-black font-semibold" id="pdf-folio"></td>
                     </tr>
-                    <tr class="border-b border-gray-200">
-                        <td class="py-2.5 px-3 w-1/3 bg-gray-50 font-semibold text-gray-600">Fecha y hora de emisión:</td>
-                        <td class="py-2.5 px-3 text-gray-900" id="pdf-fecha"></td>
+                    <tr class="border-b border-gray-300">
+                        <td class="py-2.5 px-3 w-1/3 bg-gray-100 font-bold text-black">Fecha y hora de emisión:</td>
+                        <td class="py-2.5 px-3 text-black font-semibold" id="pdf-fecha"></td>
                     </tr>
                 </tbody>
             </table>
 
-            <table class="w-full text-sm text-left border-collapse mb-12 shadow-sm rounded-md overflow-hidden">
+            <table class="w-full text-sm text-left border-collapse mb-12 shadow-sm rounded-md overflow-hidden border-2 border-gray-400">
                 <thead>
-                    <tr class="bg-gray-200 text-gray-700">
-                        <th class="py-3 px-4 font-semibold uppercase tracking-wider text-[11px] border-b border-gray-300 w-1/2">Concepto</th>
-                        <th class="py-3 px-4 font-semibold uppercase tracking-wider text-[11px] border-b border-gray-300">Detalle</th>
+                    <tr class="bg-gray-200 text-black">
+                        <th class="py-3 px-4 font-extrabold uppercase tracking-wider text-[12px] border-b-2 border-gray-400 w-1/2">Concepto</th>
+                        <th class="py-3 px-4 font-extrabold uppercase tracking-wider text-[12px] border-b-2 border-gray-400">Detalle</th>
                     </tr>
                 </thead>
-                <tbody class="border border-gray-200 bg-white">
-                    <tr class="border-b border-gray-200">
-                        <td class="py-2.5 px-4 text-gray-600">Monto en dólares (USD)</td>
-                        <td class="py-2.5 px-4 font-mono font-bold text-gray-800" id="pdf-usd"></td>
+                <tbody class="bg-white">
+                    <tr class="border-b border-gray-300">
+                        <td class="py-2.5 px-4 text-black font-semibold">Monto en dólares (USD)</td>
+                        <td class="py-2.5 px-4 font-mono font-bold text-black" id="pdf-usd"></td>
                     </tr>
-                    <tr class="border-b border-gray-200">
-                        <td class="py-2.5 px-4 text-gray-600">Tipo de cambio</td>
-                        <td class="py-2.5 px-4 font-mono font-bold text-gray-800" id="pdf-tc"></td>
+                    <tr class="border-b border-gray-300">
+                        <td class="py-2.5 px-4 text-black font-semibold">Tipo de cambio</td>
+                        <td class="py-2.5 px-4 font-mono font-bold text-black" id="pdf-tc"></td>
                     </tr>
-                    <tr class="border-b border-gray-200">
-                        <td class="py-2.5 px-4 text-gray-600">Conversión base a pesos</td>
-                        <td class="py-2.5 px-4 font-mono font-bold text-gray-800" id="pdf-conversion"></td>
+                    <tr class="border-b border-gray-300">
+                        <td class="py-2.5 px-4 text-black font-semibold">Conversión base a pesos</td>
+                        <td class="py-2.5 px-4 font-mono font-bold text-black" id="pdf-conversion"></td>
                     </tr>
-                    <tr class="border-b border-gray-200">
-                        <td class="py-2.5 px-4 text-gray-600">Comisión aplicada (<span id="pdf-pct-txt"></span>%)</td>
-                        <td class="py-2.5 px-4 font-mono font-bold text-gray-800" id="pdf-comision"></td>
+                    <tr class="border-b border-gray-300">
+                        <td class="py-2.5 px-4 text-black font-semibold">Comisión aplicada (<span id="pdf-pct-txt"></span>%)</td>
+                        <td class="py-2.5 px-4 font-mono font-bold text-black" id="pdf-comision"></td>
                     </tr>
-                    <tr class="border-b border-gray-200">
-                        <td class="py-2.5 px-4 text-gray-600">Total Neto</td>
-                        <td class="py-2.5 px-4 font-mono font-bold text-gray-800" id="pdf-total"></td>
+                    <tr class="border-b border-gray-300 bg-gray-50">
+                        <td class="py-3 px-4 text-black font-extrabold text-base">Total Neto</td>
+                        <td class="py-3 px-4 font-mono font-extrabold text-black text-base" id="pdf-total"></td>
                     </tr>
                 </tbody>
             </table>
 
-            <div class="text-[11px] text-gray-700 space-y-3 mt-16 text-center border-t border-gray-200 pt-6">
-                <p>Nota: Esta cotización es de carácter informativo y está sujeta a la volatilidad del mercado cambiario en tiempo real.</p>
-                <p class="font-bold text-gray-800">Vigencia: Esta cotización tiene una vigencia de 30 minutos a partir de su hora de emisión.</p>
+            <div class="text-[12px] text-black space-y-3 mt-16 text-center border-t-2 border-gray-400 pt-6">
+                <p class="font-semibold">Nota: Esta cotización es de carácter informativo y está sujeta a la volatilidad del mercado cambiario en tiempo real.</p>
+                <p class="font-extrabold text-black">Vigencia: Esta cotización tiene una vigencia de 30 minutos a partir de su hora de emisión.</p>
             </div>
             
         </div>
@@ -202,6 +202,7 @@
 
         let editando = { compra: null, venta: null };
         let dataTableInstancia = null; 
+        let ultimoFolioGenerado = null; // Variable para identificar la nueva cotización
 
         function aplicarMascaraMoneda(input) {
             let numeros = input.value.replace(/\D/g, '');
@@ -250,15 +251,19 @@
                 const res = await fetch('api_dolar.php');
                 const data = await res.json();
                 if (data.success) {
-                    const tcActual = parseFloat(data.precio).toFixed(2);
+                    // 1. Convertimos el precio a número para poder hacer la suma
+                    const tcCompra = parseFloat(data.precio);
+                    const tcVenta = tcCompra + 0.13; // 2. Aquí sumamos los 13 centavos
                     
                     // Solo actualizamos las casillas si NO estás a la mitad de una edición
                     if(!editando.compra) { 
-                        document.getElementById('c_tc').value = tcActual; 
+                        // Inyectamos el precio normal
+                        document.getElementById('c_tc').value = tcCompra.toFixed(2); 
                         aplicarMascaraMoneda(document.getElementById('c_tc')); 
                     }
                     if(!editando.venta) { 
-                        document.getElementById('v_tc').value = tcActual; 
+                        // Inyectamos el precio con los 13 centavos extra
+                        document.getElementById('v_tc').value = tcVenta.toFixed(2); 
                         aplicarMascaraMoneda(document.getElementById('v_tc')); 
                     }
                     
@@ -266,7 +271,8 @@
                     const ahora = new Date();
                     const horaStr = ahora.toLocaleTimeString('es-MX', { hour12: false });
                     
-                    document.getElementById('api_text').innerText = "En vivo: $" + tcActual + " MXN (Actualizado " + horaStr + ")";
+                    // Mostramos el precio de compra en la etiqueta superior
+                    document.getElementById('api_text').innerText = "En vivo: $" + tcCompra.toFixed(2) + " MXN (Actualizado " + horaStr + ")";
                     document.getElementById('api_status').classList.replace('bg-gray-800', 'bg-green-900');
                     document.getElementById('api_status').classList.replace('text-gray-400', 'text-green-100');
                     document.getElementById('api_dot').classList.replace('bg-gray-500', 'bg-green-400');
@@ -295,18 +301,39 @@
 
         async function generarPDF(tipo) {
             let prefijo = tipo === 'compra' ? 'c_' : 'v_';
+            
+            // --- VALIDACIÓN DE CAMPOS ---
+            const inputUsdTxt = document.getElementById(prefijo + 'usd').value.trim();
+            const inputComisionTxt = document.getElementById(prefijo + 'comision_pct').value.trim();
+            const usdLimpio = obtenerValorLimpio(prefijo + 'usd');
+
+            if (inputUsdTxt === '' || usdLimpio <= 0) {
+                alert("⚠️ Error: Por favor ingresa una cantidad de Dólares mayor a cero.");
+                document.getElementById(prefijo + 'usd').focus();
+                return; // Detiene el proceso
+            }
+
+            if (inputComisionTxt === '') {
+                alert("⚠️ Error: Por favor ingresa el porcentaje de comisión.");
+                document.getElementById(prefijo + 'comision_pct').focus();
+                return; // Detiene el proceso
+            }
+
             const folioActual = editando[tipo] ? editando[tipo].folio : "COT-" + Math.floor(Math.random() * 100000);
             
+            // Registramos este folio como el último generado para ponerle la etiqueta
+            ultimoFolioGenerado = folioActual;
+
             const datos = {
                 id: editando[tipo] ? editando[tipo].id : null, 
                 tipo: tipo,
                 folio: folioActual,
-                usd: obtenerValorLimpio(prefijo + 'usd'),
+                usd: usdLimpio,
                 tc: obtenerValorLimpio(prefijo + 'tc'),
-                comision_pct: parseFloat(document.getElementById(prefijo + 'comision_pct').value) || 0,
+                comision_pct: parseFloat(inputComisionTxt) || 0,
                 comision_monto: parseFloat(document.getElementById(prefijo + 'comision_monto').innerText.replace(/[^0-9.-]+/g,"")),
                 total: parseFloat(document.getElementById(prefijo + 'total').innerText.replace(/[^0-9.-]+/g,"")),
-                fecha: obtenerFechaFormateada() // Ya se guarda como "9 de abril de 2026, 12:35 p.m."
+                fecha: obtenerFechaFormateada()
             };
 
             try {
@@ -317,7 +344,8 @@
                 cargarHistorial(); 
             } catch (e) { console.error("Error BD", e); }
 
-            ejecutarAccionPDF(datos, 'descargar');
+            // MODIFICACIÓN: Ya no descarga, solo abre la vista previa
+            ejecutarAccionPDF(datos, 'previsualizar');
         }
 
         function activarEdicion(regString) {
@@ -345,7 +373,7 @@
             editando[tipo] = null;
             document.getElementById('badge_' + tipo).classList.add('hidden');
             const colorOriginal = tipo === 'compra' ? 'green' : 'blue';
-            document.getElementById('btn_' + tipo).innerText = "Guardar e Imprimir";
+            document.getElementById('btn_' + tipo).innerText = "Guardar y Ver"; // Actualizamos el texto
             document.getElementById('btn_' + tipo).className = `w-full bg-${colorOriginal}-600 hover:bg-${colorOriginal}-700 text-white font-bold py-2 rounded shadow-sm transition flex justify-center items-center gap-2 text-sm`;
             document.getElementById('btn_cancelar_' + tipo).classList.add('hidden');
         }
@@ -376,7 +404,16 @@
             document.getElementById('pdf-total').innerText = currencyFormatter.format(d.total);
 
             const elemento = document.getElementById('plantilla-pdf');
-            const opciones = { margin: 0, filename: `${d.folio}_${d.tipo}.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
+            
+            // --- MAGIA DE NITIDEZ ---
+            // Aumentamos scale a 4, mejoramos la calidad de imagen y activamos letterRendering
+            const opciones = { 
+                margin: 0, 
+                filename: `${d.folio}_${d.tipo}.pdf`, 
+                image: { type: 'jpeg', quality: 1.0 },
+                html2canvas: { scale: 4, letterRendering: true, useCORS: true }, 
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } 
+            };
 
             if(accion === 'descargar') {
                 html2pdf().set(opciones).from(elemento).save();
@@ -418,15 +455,20 @@
                 data.forEach(reg => {
                     const jsonReg = JSON.stringify(reg).replace(/"/g, '&quot;');
                     const colorTipo = reg.tipo === 'compra' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800';
-                    const colorTotal = reg.tipo === 'compra' ? 'text-green-700' : 'text-blue-800';
                     
+                    // --- CREACIÓN DEL BADGE ¡NUEVO! ---
+                    let badgeReciente = '';
+                    if (reg.folio === ultimoFolioGenerado) {
+                        badgeReciente = `<span class="ml-2 px-1.5 py-0.5 bg-green-500 text-white text-[9px] font-bold uppercase rounded animate-pulse shadow">¡Nuevo!</span>`;
+                    }
+
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-gray-50 transition border-b border-gray-100";
                     tr.innerHTML = `
                         <td class="p-3">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <div class="font-bold text-gray-800 text-xs">${reg.folio}</div>
+                                    <div class="font-bold text-gray-800 text-xs flex items-center">${reg.folio} ${badgeReciente}</div>
                                     <div class="text-[10px] text-gray-500">${reg.fecha_hora}</div>
                                 </div>
                                 <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase shadow-sm ${colorTipo}">${reg.tipo}</span>
@@ -447,7 +489,7 @@
                                 </div>
                                 <div class="flex justify-between items-center border-t border-gray-300 pt-1.5 mt-1">
                                     <span class="text-gray-800 font-extrabold uppercase text-[11px]">Total Neto:</span>
-                                    <span class="font-mono font-extrabold text-[12px] ${colorTotal}">${currencyFormatter.format(reg.total)}</span>
+                                    <span class="font-mono font-extrabold text-[12px] text-gray-900">${currencyFormatter.format(reg.total)}</span>
                                 </div>
                             </div>
                         </td>
