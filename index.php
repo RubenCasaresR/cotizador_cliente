@@ -75,6 +75,8 @@
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">CANTIDAD EN USD</label><div class="relative"><span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">$</span><input type="text" inputmode="numeric" id="c_usd" class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition" value=""></div></div>
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">TIPO DE CAMBIO</label><div class="relative"><span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">$</span><input type="text" inputmode="numeric" id="c_tc" class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition"></div></div>
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">COMISIÓN (%)</label><div class="relative"><input type="number" id="c_comision_pct" class="w-full pl-3 pr-8 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition" value=""><span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 font-bold">%</span></div></div>
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">NOMBRE DEL CLIENTE</label><input type="text" id="c_nombre" class="w-full px-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition" placeholder="Nombre completo"></div>
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">CORREO ELECTRÓNICO</label><input type="email" id="c_correo" class="w-full px-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition" placeholder="cliente@ejemplo.com"></div>
                     <hr class="my-3 border-gray-200">
                     <div class="flex justify-between items-center text-sm text-gray-600"><span class="font-semibold">Conversión (MXN)</span><span id="c_conversion" class="font-mono">$0.00</span></div>
                     <div class="flex justify-between items-center text-sm text-red-600"><span class="font-semibold">Comisión (Resta)</span><span id="c_comision_monto" class="font-mono">-$0.00</span></div>
@@ -95,6 +97,8 @@
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">CANTIDAD EN USD</label><div class="relative"><span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">$</span><input type="text" inputmode="numeric" id="v_usd" class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition" value=""></div></div>
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">TIPO DE CAMBIO</label><div class="relative"><span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">$</span><input type="text" inputmode="numeric" id="v_tc" class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition"></div></div>
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">COMISIÓN (%)</label><div class="relative"><input type="number" id="v_comision_pct" class="w-full pl-3 pr-8 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition" value=""><span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 font-bold">%</span></div></div>
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">NOMBRE DEL CLIENTE</label><input type="text" id="v_nombre" class="w-full px-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Nombre completo"></div>
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">CORREO ELECTRÓNICO</label><input type="email" id="v_correo" class="w-full px-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="cliente@ejemplo.com"></div>
                     <hr class="my-3 border-gray-200">
                     <div class="flex justify-between items-center text-sm text-gray-600"><span class="font-semibold">Conversión (MXN)</span><span id="v_conversion" class="font-mono">$0.00</span></div>
                     <div class="flex justify-between items-center text-sm text-blue-600"><span class="font-semibold">Comisión (Suma)</span><span id="v_comision_monto" class="font-mono">+$0.00</span></div>
@@ -153,6 +157,14 @@
                     <tr class="border-b border-gray-300">
                         <td class="py-2.5 px-3 w-1/3 bg-gray-100 font-bold text-black">Fecha y hora de emisión:</td>
                         <td class="py-2.5 px-3 text-black font-semibold" id="pdf-fecha"></td>
+                    </tr>
+                    <tr class="border-b border-gray-300">
+                        <td class="py-2.5 px-3 w-1/3 bg-gray-100 font-bold text-black">Cliente:</td>
+                        <td class="py-2.5 px-3 text-black font-semibold" id="pdf-cliente"></td>
+                    </tr>
+                    <tr class="border-b border-gray-300">
+                        <td class="py-2.5 px-3 w-1/3 bg-gray-100 font-bold text-black">Correo:</td>
+                        <td class="py-2.5 px-3 text-black font-semibold" id="pdf-correo"></td>
                     </tr>
                 </tbody>
             </table>
@@ -328,6 +340,8 @@
                 id: editando[tipo] ? editando[tipo].id : null, 
                 tipo: tipo,
                 folio: folioActual,
+                cliente_nombre: document.getElementById(prefijo + 'nombre').value.trim(),
+                cliente_correo: document.getElementById(prefijo + 'correo').value.trim(),
                 usd: usdLimpio,
                 tc: obtenerValorLimpio(prefijo + 'tc'),
                 comision_pct: parseFloat(inputComisionTxt) || 0,
@@ -356,6 +370,8 @@
             document.getElementById(prefijo + 'usd').value = parseFloat(reg.usd).toFixed(2);
             document.getElementById(prefijo + 'tc').value = parseFloat(reg.tc).toFixed(2);
             document.getElementById(prefijo + 'comision_pct').value = reg.comision_pct;
+            document.getElementById(prefijo + 'nombre').value = reg.cliente_nombre || '';
+            document.getElementById(prefijo + 'correo').value = reg.cliente_correo || '';
             
             aplicarMascaraMoneda(document.getElementById(prefijo + 'usd'));
             aplicarMascaraMoneda(document.getElementById(prefijo + 'tc'));
@@ -376,6 +392,9 @@
             document.getElementById('btn_' + tipo).innerText = "Guardar y Ver"; // Actualizamos el texto
             document.getElementById('btn_' + tipo).className = `w-full bg-${colorOriginal}-600 hover:bg-${colorOriginal}-700 text-white font-bold py-2 rounded shadow-sm transition flex justify-center items-center gap-2 text-sm`;
             document.getElementById('btn_cancelar_' + tipo).classList.add('hidden');
+            const prefijo = tipo === 'compra' ? 'c_' : 'v_';
+            document.getElementById(prefijo + 'nombre').value = '';
+            document.getElementById(prefijo + 'correo').value = '';
         }
 
         async function eliminarCotizacion(id) {
@@ -393,6 +412,8 @@
             
             // Simplemente imprimimos la fecha que ya viene lista
             document.getElementById('pdf-fecha').innerText = d.fecha;
+            document.getElementById('pdf-cliente').innerText = d.cliente_nombre || '---';
+            document.getElementById('pdf-correo').innerText = d.cliente_correo || '---';
             
             document.getElementById('pdf-usd').innerText = usdFormatter.format(d.usd);
             document.getElementById('pdf-tc').innerText = currencyFormatter.format(d.tc) + " MXN";
@@ -422,6 +443,18 @@
                     document.getElementById('preview-iframe').src = pdfUrl;
                     document.getElementById('modal-preview').classList.remove('hidden');
                 });
+            } else if (accion === 'enviar') {
+                document.getElementById('modal-preview').classList.add('hidden');
+                html2pdf().set(opciones).from(elemento).outputPdf('datauristring').then(function(dataUrl) {
+                    fetch('api_correo.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ correo: d.cliente_correo, nombre: d.cliente_nombre, folio: d.folio, pdfBase64: dataUrl })
+                    }).then(function(r) { return r.json(); }).then(function(res) {
+                        if (res.success) { alert('Correo enviado con éxito a ' + d.cliente_correo); }
+                        else { alert('Error: ' + (res.error || 'Desconocido')); }
+                    }).catch(function() { alert('Error de conexión al enviar correo'); });
+                });
             }
         }
 
@@ -440,6 +473,13 @@
             const reg = JSON.parse(regString.replace(/&quot;/g, '"'));
             reg.fecha = obtenerFechaFormateada(reg.fecha_hora);
             ejecutarAccionPDF(reg, 'descargar');
+        }
+
+        function enviarCotizacion(regString) {
+            const reg = JSON.parse(regString.replace(/&quot;/g, '"'));
+            if (!reg.cliente_correo) { alert('El registro no tiene correo electrónico'); return; }
+            reg.fecha = obtenerFechaFormateada(reg.fecha_hora);
+            ejecutarAccionPDF(reg, 'enviar');
         }
 
         async function cargarHistorial() {
@@ -498,6 +538,7 @@
                                 <button onclick="abrirVistaPrevia('${jsonReg}')" class="text-blue-600 hover:bg-blue-100 p-1.5 rounded-md border border-transparent hover:border-blue-200 transition bg-white shadow-sm" title="Ver PDF"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button>
                                 <button onclick="reimprimir('${jsonReg}')" class="text-green-600 hover:bg-green-100 p-1.5 rounded-md border border-transparent hover:border-green-200 transition bg-white shadow-sm" title="Descargar PDF"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg></button>
                                 <button onclick="activarEdicion('${jsonReg}')" class="text-yellow-600 hover:bg-yellow-100 p-1.5 rounded-md border border-transparent hover:border-yellow-200 transition bg-white shadow-sm" title="Editar"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
+                                ${reg.cliente_correo ? '<button onclick="enviarCotizacion(\'' + jsonReg + '\')" class="text-blue-500 hover:bg-blue-100 p-1.5 rounded-md border border-transparent hover:border-blue-200 transition bg-white shadow-sm" title="Enviar por correo"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></button>' : ''}
                                 <button onclick="eliminarCotizacion(${reg.id})" class="text-red-500 hover:bg-red-100 p-1.5 rounded-md border border-transparent hover:border-red-200 transition bg-white shadow-sm" title="Eliminar"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                             </div>
                         </td>

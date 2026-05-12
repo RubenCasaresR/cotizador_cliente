@@ -10,13 +10,13 @@ if ($action == 'guardar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
     
     // Si viene con un ID, es una EDICIÓN
     if (isset($d['id']) && !empty($d['id'])) {
-        $stmt = $conn->prepare("UPDATE cotizaciones SET usd=?, tc=?, comision_pct=?, comision_monto=?, total=? WHERE id=?");
-        $stmt->bind_param("dddddi", $d['usd'], $d['tc'], $d['comision_pct'], $d['comision_monto'], $d['total'], $d['id']);
+        $stmt = $conn->prepare("UPDATE cotizaciones SET cliente_nombre=?, cliente_correo=?, usd=?, tc=?, comision_pct=?, comision_monto=?, total=? WHERE id=?");
+        $stmt->bind_param("ssdddddi", $d['cliente_nombre'], $d['cliente_correo'], $d['usd'], $d['tc'], $d['comision_pct'], $d['comision_monto'], $d['total'], $d['id']);
     } 
     // Si no tiene ID, es una cotización NUEVA
     else {
-        $stmt = $conn->prepare("INSERT INTO cotizaciones (folio, tipo, usd, tc, comision_pct, comision_monto, total) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssddddd", $d['folio'], $d['tipo'], $d['usd'], $d['tc'], $d['comision_pct'], $d['comision_monto'], $d['total']);
+        $stmt = $conn->prepare("INSERT INTO cotizaciones (folio, tipo, cliente_nombre, cliente_correo, usd, tc, comision_pct, comision_monto, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssddddd", $d['folio'], $d['tipo'], $d['cliente_nombre'], $d['cliente_correo'], $d['usd'], $d['tc'], $d['comision_pct'], $d['comision_monto'], $d['total']);
     }
     
     if ($stmt->execute()) {
