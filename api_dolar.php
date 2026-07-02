@@ -1,9 +1,9 @@
 <?php
-// Indicamos que este archivo devolverá datos en formato JSON
 header('Content-Type: application/json');
 
-// URL directa al JSON de datos financieros de Yahoo para el par USD/MXN (Dólar a Peso Mexicano)
-$url = 'https://query1.finance.yahoo.com/v8/finance/chart/MXN=X';
+$moneda = $_GET['moneda'] ?? 'MXN';
+$symbol = $moneda === 'CNY' ? 'CNY=X' : 'MXN=X';
+$url = "https://query1.finance.yahoo.com/v8/finance/chart/$symbol";
 
 // Iniciamos cURL
 $ch = curl_init();

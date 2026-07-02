@@ -46,7 +46,11 @@
     <header class="bg-gray-900 text-white py-3 px-6 shadow-md flex justify-between items-center shrink-0 z-10">
         <div class="flex items-center gap-3">
             <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <h1 class="text-xl font-bold tracking-wider">DASHBOARD DIVISAS</h1>
+            <h1 id="dashboard_titulo" class="text-xl font-bold tracking-wider">DASHBOARD DIVISAS</h1>
+            <div class="flex items-center gap-1 ml-4 bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+                <button id="btn-mode-usa" onclick="setModo('usa')" class="px-3 py-1 text-xs font-bold bg-green-600 text-white transition">USA</button>
+                <button id="btn-mode-china" onclick="setModo('china')" class="px-3 py-1 text-xs font-bold text-gray-400 hover:text-white transition">CHINA</button>
+            </div>
         </div>
         
         <div class="flex items-center gap-6">
@@ -74,11 +78,11 @@
                 <div class="p-5 space-y-3 flex-grow">
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">CANTIDAD EN USD</label><div class="relative"><span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">$</span><input type="text" inputmode="numeric" id="c_usd" class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition" value=""></div></div>
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">TIPO DE CAMBIO</label><div class="relative"><span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">$</span><input type="text" inputmode="numeric" id="c_tc" class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition"></div></div>
-                    <div><label class="block text-xs font-bold text-gray-600 mb-1">COMISIÓN (%)</label><div class="relative"><input type="number" id="c_comision_pct" class="w-full pl-3 pr-8 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition" value=""><span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 font-bold">%</span></div></div>
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">COMISIÓN (%)</label><div class="relative"><input type="number" id="c_comision_pct" class="w-full pl-3 pr-8 py-1.5 bg-gray-100 border rounded cursor-not-allowed" value="1.25" readonly><span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 font-bold">%</span></div></div>
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">NOMBRE DEL CLIENTE</label><input type="text" id="c_nombre" class="w-full px-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition" placeholder="Nombre completo"></div>
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">CORREO ELECTRÓNICO</label><input type="email" id="c_correo" class="w-full px-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-green-500 outline-none transition" placeholder="cliente@ejemplo.com"></div>
                     <hr class="my-3 border-gray-200">
-                    <div class="flex justify-between items-center text-sm text-gray-600"><span class="font-semibold">Conversión (MXN)</span><span id="c_conversion" class="font-mono">$0.00</span></div>
+                    <div class="flex justify-between items-center text-sm text-gray-600"><span class="font-semibold">Conversión (<span id="c_moneda_label">MXN</span>)</span><span id="c_conversion" class="font-mono">$0.00</span></div>
                     <div class="flex justify-between items-center text-sm text-red-600"><span class="font-semibold">Comisión (Resta)</span><span id="c_comision_monto" class="font-mono">-$0.00</span></div>
                     <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2"><span class="text-sm font-bold text-gray-700">TOTAL NETO</span><span id="c_total" class="text-xl font-mono font-bold text-green-700">$0.00</span></div>
                 </div>
@@ -96,11 +100,11 @@
                 <div class="p-5 space-y-3 flex-grow">
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">CANTIDAD EN USD</label><div class="relative"><span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">$</span><input type="text" inputmode="numeric" id="v_usd" class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition" value=""></div></div>
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">TIPO DE CAMBIO</label><div class="relative"><span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 font-bold">$</span><input type="text" inputmode="numeric" id="v_tc" class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition"></div></div>
-                    <div><label class="block text-xs font-bold text-gray-600 mb-1">COMISIÓN (%)</label><div class="relative"><input type="number" id="v_comision_pct" class="w-full pl-3 pr-8 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition" value=""><span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 font-bold">%</span></div></div>
+                    <div><label class="block text-xs font-bold text-gray-600 mb-1">COMISIÓN (%)</label><div class="relative"><input type="number" id="v_comision_pct" class="w-full pl-3 pr-8 py-1.5 bg-gray-100 border rounded cursor-not-allowed" value="1.25" readonly><span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 font-bold">%</span></div></div>
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">NOMBRE DEL CLIENTE</label><input type="text" id="v_nombre" class="w-full px-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Nombre completo"></div>
                     <div><label class="block text-xs font-bold text-gray-600 mb-1">CORREO ELECTRÓNICO</label><input type="email" id="v_correo" class="w-full px-3 py-1.5 bg-gray-50 border rounded focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="cliente@ejemplo.com"></div>
                     <hr class="my-3 border-gray-200">
-                    <div class="flex justify-between items-center text-sm text-gray-600"><span class="font-semibold">Conversión (MXN)</span><span id="v_conversion" class="font-mono">$0.00</span></div>
+                    <div class="flex justify-between items-center text-sm text-gray-600"><span class="font-semibold">Conversión (<span id="v_moneda_label">MXN</span>)</span><span id="v_conversion" class="font-mono">$0.00</span></div>
                     <div class="flex justify-between items-center text-sm text-blue-600"><span class="font-semibold">Comisión (Suma)</span><span id="v_comision_monto" class="font-mono">+$0.00</span></div>
                     <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2"><span class="text-sm font-bold text-gray-700">TOTAL NETO</span><span id="v_total" class="text-xl font-mono font-bold text-blue-800">$0.00</span></div>
                 </div>
@@ -186,7 +190,7 @@
                         <td class="py-2.5 px-4 font-mono font-bold text-black" id="pdf-tc"></td>
                     </tr>
                     <tr class="border-b border-gray-300">
-                        <td class="py-2.5 px-4 text-black font-semibold">Conversión base a pesos</td>
+                        <td class="py-2.5 px-4 text-black font-semibold">Conversión base <span id="pdf-conversion-label">a pesos</span></td>
                         <td class="py-2.5 px-4 font-mono font-bold text-black" id="pdf-conversion"></td>
                     </tr>
                     <tr class="border-b border-gray-300">
@@ -209,9 +213,10 @@
     </div>
 
     <script>
-        const currencyFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', minimumFractionDigits: 2 });
+        let currencyFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', minimumFractionDigits: 2 });
         const usdFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
 
+        let paisActual = 'usa';
         let editando = { compra: null, venta: null };
         let dataTableInstancia = null; 
         let ultimoFolioGenerado = null; // Variable para identificar la nueva cotización
@@ -258,33 +263,57 @@
             document.getElementById('v_total').innerText = currencyFormatter.format(total);
         }
 
+        function setModo(pais) {
+            paisActual = pais;
+
+            document.getElementById('btn-mode-usa').className = pais === 'usa'
+                ? 'px-3 py-1 text-xs font-bold bg-green-600 text-white transition'
+                : 'px-3 py-1 text-xs font-bold text-gray-400 hover:text-white transition';
+            document.getElementById('btn-mode-china').className = pais === 'china'
+                ? 'px-3 py-1 text-xs font-bold bg-green-600 text-white transition'
+                : 'px-3 py-1 text-xs font-bold text-gray-400 hover:text-white transition';
+
+            if (pais === 'china') {
+                currencyFormatter = new Intl.NumberFormat('zh-CN', { style: 'currency', currency: 'CNY', minimumFractionDigits: 2 });
+            } else {
+                currencyFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', minimumFractionDigits: 2 });
+            }
+
+            document.getElementById('c_moneda_label').innerText = pais === 'china' ? 'CNY' : 'MXN';
+            document.getElementById('v_moneda_label').innerText = pais === 'china' ? 'CNY' : 'MXN';
+            document.getElementById('dashboard_titulo').innerText = pais === 'china' ? 'DASHBOARD DIVISAS \u2014 CHINA' : 'DASHBOARD DIVISAS';
+
+            obtenerTipoCambioYahoo();
+            cargarHistorial();
+            calcularCompra();
+            calcularVenta();
+        }
+
         async function obtenerTipoCambioYahoo() {
             try {
-                const res = await fetch('api_dolar.php');
+                const moneda = paisActual === 'china' ? 'CNY' : 'MXN';
+                const res = await fetch('api_dolar.php?moneda=' + moneda);
                 const data = await res.json();
                 if (data.success) {
-                    // 1. Convertimos el precio a número para poder hacer la suma
                     const tcCompra = parseFloat(data.precio);
-                    const tcVenta = tcCompra + 0.13; // 2. Aquí sumamos los 13 centavos
+                    const recargo = paisActual === 'china' ? 0.18 : 0.13;
+                    const tcVenta = tcCompra + recargo;
+                    const simbolo = paisActual === 'china' ? '\u00a5' : '$';
+                    const codigo = paisActual === 'china' ? 'CNY' : 'MXN';
                     
-                    // Solo actualizamos las casillas si NO estás a la mitad de una edición
                     if(!editando.compra) { 
-                        // Inyectamos el precio normal
                         document.getElementById('c_tc').value = tcCompra.toFixed(2); 
                         aplicarMascaraMoneda(document.getElementById('c_tc')); 
                     }
                     if(!editando.venta) { 
-                        // Inyectamos el precio con los 13 centavos extra
                         document.getElementById('v_tc').value = tcVenta.toFixed(2); 
                         aplicarMascaraMoneda(document.getElementById('v_tc')); 
                     }
                     
-                    // Sacamos la hora actual para mostrarla en el indicador
                     const ahora = new Date();
                     const horaStr = ahora.toLocaleTimeString('es-MX', { hour12: false });
                     
-                    // Mostramos el precio de compra en la etiqueta superior
-                    document.getElementById('api_text').innerText = "En vivo: $" + tcCompra.toFixed(2) + " MXN (Actualizado " + horaStr + ")";
+                    document.getElementById('api_text').innerText = "En vivo: " + simbolo + tcCompra.toFixed(2) + " " + codigo + " (Actualizado " + horaStr + ")";
                     document.getElementById('api_status').classList.replace('bg-gray-800', 'bg-green-900');
                     document.getElementById('api_status').classList.replace('text-gray-400', 'text-green-100');
                     document.getElementById('api_dot').classList.replace('bg-gray-500', 'bg-green-400');
@@ -351,7 +380,7 @@
             };
 
             try {
-                await fetch('api_historial.php?action=guardar', {
+                await fetch('api_historial.php?action=guardar&pais=' + paisActual, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos)
                 });
                 cancelarEdicion(tipo); 
@@ -399,7 +428,7 @@
 
         async function eliminarCotizacion(id) {
             if(confirm("¿Estás seguro de eliminar esta cotización del historial?")) {
-                await fetch('api_historial.php?action=eliminar', {
+                await fetch('api_historial.php?action=eliminar&pais=' + paisActual, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({id: id})
                 });
                 cargarHistorial();
@@ -416,7 +445,8 @@
             document.getElementById('pdf-correo').innerText = d.cliente_correo || '---';
             
             document.getElementById('pdf-usd').innerText = usdFormatter.format(d.usd);
-            document.getElementById('pdf-tc').innerText = currencyFormatter.format(d.tc) + " MXN";
+            document.getElementById('pdf-tc').innerText = currencyFormatter.format(d.tc) + " " + (paisActual === 'china' ? 'CNY' : 'MXN');
+            document.getElementById('pdf-conversion-label').innerText = paisActual === 'china' ? 'a Yuan (CNY)' : 'a pesos (MXN)';
             document.getElementById('pdf-conversion').innerText = currencyFormatter.format(d.usd * d.tc);
             document.getElementById('pdf-pct-txt').innerText = d.comision_pct;
             
@@ -484,7 +514,10 @@
 
         async function cargarHistorial() {
             try {
-                const res = await fetch('api_historial.php?action=listar');
+                const cliente = document.getElementById('c_nombre').value.trim() || document.getElementById('v_nombre').value.trim() || '';
+                let url = 'api_historial.php?action=listar&pais=' + paisActual;
+                if (cliente) url += '&cliente=' + encodeURIComponent(cliente);
+                const res = await fetch(url);
                 const data = await res.json();
                 
                 if (dataTableInstancia) { dataTableInstancia.destroy(); }
@@ -561,9 +594,11 @@
 
         ['c_usd', 'c_tc'].forEach(id => { document.getElementById(id).addEventListener('input', function(e) { aplicarMascaraMoneda(e.target); calcularCompra(); }); });
         document.getElementById('c_comision_pct').addEventListener('input', calcularCompra);
+        document.getElementById('c_nombre').addEventListener('input', cargarHistorial);
 
         ['v_usd', 'v_tc'].forEach(id => { document.getElementById(id).addEventListener('input', function(e) { aplicarMascaraMoneda(e.target); calcularVenta(); }); });
         document.getElementById('v_comision_pct').addEventListener('input', calcularVenta);
+        document.getElementById('v_nombre').addEventListener('input', cargarHistorial);
 
         // --- NUEVA FUNCIÓN: Reloj que avanza segundo a segundo ---
         function iniciarRelojVivo() {

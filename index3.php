@@ -154,6 +154,7 @@
 <div class="header">
   <h1><i class="ti ti-currency-dollar" style="font-size:18px;vertical-align:-3px;margin-right:6px"></i>DASHBOARD DIVISAS</h1>
   <div style="display:flex;align-items:center;gap:16px;">
+    <a href="crear_factura_ui.php" style="color:#60a5fa;font-size:13px;text-decoration:none;display:flex;align-items:center;gap:4px;transition:opacity .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'"><i class="ti ti-file-plus"></i> Facturaci&oacute;n</a>
     <div class="clock" id="clock">00:00:00</div>
     <div class="live-badge"><div class="dot"></div><span id="live-rate">$17.34 MXN</span> en vivo</div>
   </div>
